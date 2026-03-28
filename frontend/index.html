@@ -1,0 +1,300 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Realtime Chat App</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="bg-blobs" aria-hidden="true">
+      <span class="blob blob-1"></span>
+      <span class="blob blob-2"></span>
+      <span class="blob blob-3"></span>
+    </div>
+    <main class="shell">
+      <section id="authSection" class="auth-card">
+        <div class="auth-header">
+          <div class="logo-badge" aria-hidden="true">
+            <div class="logo-ring"></div>
+            <div class="logo-core"></div>
+          </div>
+          <div>
+            <h1>Realtime Chat</h1>
+            <p class="subtitle">Secure JWT + Socket.IO chat</p>
+            <p class="tagline">Connect with friends instantly</p>
+          </div>
+        </div>
+
+        <div class="tabs">
+          <button id="loginTab" class="tab active" type="button">Login</button>
+          <button id="registerTab" class="tab" type="button">Signup</button>
+        </div>
+
+        <form id="loginForm" class="form active" novalidate>
+          <label>Email</label>
+          <div class="input-group">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path><path d="M22 8.5 12 14 2 8.5"></path></svg>
+            </span>
+            <input id="loginEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div id="loginEmailErr" class="error"></div>
+
+          <label>Password</label>
+          <div class="input-group">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 1 1 8 0v3"></path></svg>
+            </span>
+            <input id="loginPassword" type="password" placeholder="******" autocomplete="current-password" />
+            <button class="password-toggle" type="button" data-target="loginPassword" aria-label="Show password">Show</button>
+          </div>
+          <div id="loginPasswordErr" class="error"></div>
+
+          <div class="auth-row">
+            <label class="checkbox">
+              <input id="rememberMe" type="checkbox" />
+              <span>Remember me</span>
+            </label>
+            <a class="link" href="#" aria-label="Recover password">Forgot password?</a>
+          </div>
+
+          <button id="loginBtn" class="primary" type="submit">
+            <span class="btn-label">Login</span>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <form id="registerForm" class="form" novalidate>
+          <label>Username</label>
+          <div class="input-group">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"></circle><path d="M4 20c1.8-4 5-6 8-6s6.2 2 8 6"></path></svg>
+            </span>
+            <input id="registerUsername" type="text" placeholder="john" autocomplete="username" />
+          </div>
+          <div id="registerUsernameErr" class="error"></div>
+
+          <label>Email</label>
+          <div class="input-group">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 6h16a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2z"></path><path d="M22 8.5 12 14 2 8.5"></path></svg>
+            </span>
+            <input id="registerEmail" type="email" placeholder="you@example.com" autocomplete="email" />
+          </div>
+          <div id="registerEmailErr" class="error"></div>
+
+          <label>Password</label>
+          <div class="input-group">
+            <span class="input-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 1 1 8 0v3"></path></svg>
+            </span>
+            <input id="registerPassword" type="password" placeholder="******" autocomplete="new-password" />
+            <button class="password-toggle" type="button" data-target="registerPassword" aria-label="Show password">Show</button>
+          </div>
+          <div id="registerPasswordErr" class="error"></div>
+
+          <button id="registerBtn" class="primary" type="submit">
+            <span class="btn-label">Create Account</span>
+            <span class="btn-spinner" aria-hidden="true"></span>
+          </button>
+        </form>
+
+        <p id="authMessage" class="message" role="status" aria-live="polite"></p>
+      </section>
+
+      <section id="chatSection" class="chat-layout hidden">
+        <div id="sidebarOverlay" class="sidebar-overlay hidden"></div>
+        <aside class="sidebar">
+          <div class="sidebar-header">
+            <div class="profile">
+              <div id="meAvatar" class="avatar"></div>
+              <div>
+                <p id="meName" class="name"></p>
+                <p class="hint">You</p>
+              </div>
+            </div>
+            <button id="logoutBtn" type="button" class="ghost">Logout</button>
+          </div>
+
+          <div class="panel-title">Users</div>
+          <input id="userSearchInput" class="search" type="text" placeholder="Search users..." />
+          <ul id="usersList" class="list"></ul>
+
+          <div class="panel-title">Rooms</div>
+          <div class="row">
+            <input id="roomNameInput" type="text" placeholder="New room" />
+            <button id="createRoomBtn" class="ghost" type="button">+</button>
+          </div>
+          <ul id="roomsList" class="list"></ul>
+
+          <div class="panel-title calls-title">
+            Calls
+            <span id="callBadge" class="badge hidden">0</span>
+          </div>
+          <ul id="callsList" class="list calls-list"></ul>
+        </aside>
+
+        <section class="chat-panel">
+          <header class="chat-header">
+            <div class="header-main" id="profilePanelTrigger" role="button" tabindex="0" title="View contact info">
+              <div class="avatar-wrap">
+                <div id="chatAvatar" class="avatar lg">#</div>
+                <span id="chatOnlineBadge" class="chat-online-badge hidden">online now</span>
+              </div>
+              <div>
+                <h2 id="chatTitle">Select a user</h2>
+                <p id="chatPresence" class="hint chat-presence-row">
+                  <span id="chatPresenceDot" class="status-dot offline"></span>
+                  <span id="chatPresenceText">No chat selected</span>
+                </p>
+              </div>
+            </div>
+            <div class="chat-header-actions">
+              <button id="voiceCallBtn" class="ghost icon-btn" type="button" title="Start voice call">📞</button>
+                  <button id="sidebarToggle" class="ghost icon-btn mobile-only" type="button" aria-label="Open menu">☰</button>
+              <button id="videoCallBtn" class="ghost icon-btn" type="button" title="Start video call">📹</button>
+              <p id="typingStatus" class="hint"></p>
+            </div>
+          </header>
+
+          <div id="messagesLoading" class="messages-loading hidden" aria-live="polite">
+            <span class="spinner" aria-hidden="true"></span>
+            <span id="messagesLoadingText">Loading messages...</span>
+          </div>
+
+          <div id="messages" class="messages"></div>
+          <div id="emptyState" class="empty-state">Select a user to start chatting</div>
+
+          <form id="messageForm" class="composer">
+            <button id="emojiBtn" class="ghost icon-btn" type="button" title="Add emoji">😀</button>
+            <label for="fileInput" class="attach-btn" title="Share file/image">📎</label>
+            <button id="voiceBtn" class="ghost icon-btn" type="button" title="Record voice message">🎤</button>
+            <button id="locationBtn" class="ghost icon-btn" type="button" title="Share live location">📍</button>
+            <span id="voiceTimer" class="voice-timer hidden">00:00</span>
+            <input id="fileInput" type="file" accept="image/png,image/jpeg,image/webp,image/gif,application/pdf,audio/webm,audio/ogg,audio/mpeg,audio/wav,audio/mp4" hidden />
+            <input id="messageInput" type="text" placeholder="Type a message..." autocomplete="off" />
+            <button id="sendBtn" class="primary send" type="submit">➤</button>
+          </form>
+          <div id="emojiTray" class="emoji-tray hidden">
+            <button type="button" class="emoji-item">😀</button>
+            <button type="button" class="emoji-item">😂</button>
+            <button type="button" class="emoji-item">😍</button>
+            <button type="button" class="emoji-item">👍</button>
+            <button type="button" class="emoji-item">🙏</button>
+            <button type="button" class="emoji-item">🔥</button>
+          </div>
+          <div id="attachmentPreview" class="attachment-preview"></div>
+
+          <div id="profilePanelOverlay" class="profile-overlay hidden"></div>
+          <aside id="profilePanel" class="profile-panel" aria-hidden="true">
+            <div class="profile-panel-head">
+              <h3>Contact info</h3>
+              <button id="profilePanelClose" class="panel-close" type="button" aria-label="Close contact panel">✕</button>
+            </div>
+
+            <div class="profile-panel-body">
+              <div class="profile-top-card">
+                <div id="profileAvatar" class="avatar profile-avatar">?</div>
+                <h4 id="profileName">Select a contact</h4>
+                <p id="profilePresence" class="hint">No chat selected</p>
+
+                <div class="profile-contact-lines">
+                  <p class="profile-contact-line">
+                    <span class="profile-contact-label">Phone</span>
+                    <span id="profilePhone" class="profile-contact-value">Not shared</span>
+                  </p>
+                  <p class="profile-contact-line">
+                    <span class="profile-contact-label">Email</span>
+                    <span id="profileEmail" class="profile-contact-value">Not shared</span>
+                  </p>
+                </div>
+
+                <div class="profile-quick-actions">
+                  <button class="profile-quick-btn" type="button" title="Search conversation">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><line x1="16.5" y1="16.5" x2="21" y2="21"></line></svg>
+                    <span>Search</span>
+                  </button>
+                  <button class="profile-quick-btn" type="button" title="Start video call">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="6" width="12" height="12" rx="2"></rect><path d="M15 10l6-3v10l-6-3z"></path></svg>
+                    <span>Video</span>
+                  </button>
+                  <button class="profile-quick-btn" type="button" title="Start voice call">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 4h4l2 5-2.5 2.5a16 16 0 0 0 4 4L15 13l5 2v4a2 2 0 0 1-2.2 2A17 17 0 0 1 3 6.2 2 2 0 0 1 5 4z"></path></svg>
+                    <span>Voice</span>
+                  </button>
+                </div>
+              </div>
+
+              <div class="profile-section">
+                <div class="profile-label">About</div>
+                <p id="profileAbout" class="profile-about">—</p>
+              </div>
+
+              <div class="profile-section">
+                <div class="profile-label">Shared media</div>
+                <div id="profileStats" class="profile-stats">0 media · 0 messages</div>
+                <div id="profileMediaGrid" class="profile-media-grid"></div>
+              </div>
+
+              <div class="profile-options">
+                <button id="toggleFavouriteBtn" class="profile-option-row" type="button">Add to favourites</button>
+                <button id="toggleBlockBtn" class="profile-option-row danger" type="button">Block user</button>
+                <button id="clearChatBtn" class="profile-option-row" type="button">Clear chat</button>
+                <button id="deleteConversationBtn" class="profile-option-row danger" type="button">Delete conversation</button>
+              </div>
+            </div>
+          </aside>
+
+          <div id="mediaPreviewModal" class="media-preview hidden">
+            <button id="mediaPreviewClose" class="ghost" type="button">Close</button>
+            <img id="mediaPreviewImage" alt="Shared media preview" />
+          </div>
+
+          <div id="callModal" class="call-modal hidden" aria-live="polite">
+            <div class="call-card">
+              <h3 id="callTitle">Call</h3>
+              <div class="call-peer">
+                <div id="callAvatar" class="avatar call-avatar">?</div>
+                <div>
+                  <div id="callPeerName" class="call-peer-name">Contact</div>
+                  <div id="callStatus" class="hint">Connecting...</div>
+                </div>
+              </div>
+
+              <div id="callVideos" class="call-videos hidden">
+                <video id="remoteVideo" class="remote-video" autoplay playsinline></video>
+                <video id="localVideo" class="local-video" autoplay muted playsinline></video>
+              </div>
+
+              <div class="call-actions">
+                <button id="acceptCallBtn" class="primary hidden" type="button">Accept</button>
+                <button id="rejectCallBtn" class="ghost danger hidden" type="button">Reject</button>
+                <button id="muteCallBtn" class="ghost hidden" type="button">Mute</button>
+                <button id="toggleCamBtn" class="ghost hidden" type="button">Camera Off</button>
+                <button id="endCallBtn" class="ghost danger" type="button">End</button>
+              </div>
+            </div>
+          </div>
+          <div id="callToast" class="call-toast hidden" role="status" aria-live="polite">
+            <div class="call-toast-main">
+              <div id="callToastAvatar" class="avatar call-toast-avatar">?</div>
+              <div class="call-toast-info">
+                <div id="callToastTitle" class="call-toast-title">Incoming call</div>
+                <div id="callToastText" class="call-toast-text">Incoming call...</div>
+              </div>
+            </div>
+            <div class="call-toast-actions">
+              <button id="callToastAccept" class="toast-btn accept" type="button">Accept</button>
+              <button id="callToastReject" class="toast-btn reject" type="button">Reject</button>
+              <button id="callToastCallback" class="toast-btn" type="button">Call back</button>
+            </div>
+          </div>
+        </section>
+      </section>
+    </main>
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script src="/app.js"></script>
+  </body>
+</html>

@@ -1,0 +1,12 @@
+{
+  "name": "realtime-chat-app",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "concurrently -n backend,frontend -c green,cyan \"npm --prefix backend run dev\" \"serve frontend -l 5173\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2",
+    "serve": "^14.2.4"
+  }
+}

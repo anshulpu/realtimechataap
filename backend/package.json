@@ -1,0 +1,33 @@
+{
+  "name": "realtime-chat-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/server.js",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "start": "node src/server.js",
+    "verify:multi": "node scripts/verify-multi-instance.mjs",
+    "verify:same-user-sockets": "node scripts/verify-multi-sockets-same-user.mjs",
+    "verify:webrtc": "node scripts/verify-webrtc-signaling.mjs",
+    "verify:all": "powershell -ExecutionPolicy Bypass -File scripts/verify-all.ps1",
+    "cleanup:verifier-users": "node scripts/cleanup-verifier-users.mjs"
+  },
+  "dependencies": {
+    "@socket.io/redis-adapter": "^8.3.0",
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "helmet": "^8.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.9.6",
+    "multer": "^2.0.2",
+    "redis": "^5.11.0",
+    "socket.io": "^4.8.1"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "socket.io-client": "^4.8.3"
+  }
+}
