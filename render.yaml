@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: realtime-chat-app
+    env: node
+    plan: free
+    buildCommand: npm install --prefix backend
+    startCommand: node backend/src/server.js
+    healthCheckPath: /
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "18"
+      - key: JWT_SECRET
+        sync: false
+      - key: MONGODB_URI
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false
+      - key: ALLOW_VERIFIER_USERS
+        value: "false"
