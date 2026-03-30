@@ -24,7 +24,11 @@ const CORS_ORIGIN_RAW = process.env.CORS_ORIGIN || "";
 const CORS_ORIGINS = CORS_ORIGIN_RAW.split(",")
   .map((origin) => origin.trim())
   .filter(Boolean);
-const DEFAULT_CORS_ORIGINS = [`http://localhost:${PORT}`, "http://localhost:5173"];
+const DEFAULT_CORS_ORIGINS = [
+  `http://localhost:${PORT}`,
+  "http://localhost:5173",
+  "https://realtimechatapp.web.app"
+];
 const CORS_ORIGIN = CORS_ORIGINS.length ? CORS_ORIGINS : DEFAULT_CORS_ORIGINS;
 const ALLOW_ALL_ORIGINS = CORS_ORIGIN.includes("*");
 const REDIS_URL = process.env.REDIS_URL || "";
