@@ -1,5 +1,6 @@
-// Update API base URL for production deployment
-const BASE_URL = window?.ENV?.API_BASE_URL || "https://realtimechataap-zpvo.onrender.com";
+// Production API base URL
+const BASE_URL = "https://realtimechataap-zpvo.onrender.com";
+import { io } from "socket.io-client";
 const SOCKET_URL = "https://realtimechataap-zpvo.onrender.com";
 
 const authSection = document.getElementById("authSection");
@@ -1482,37 +1483,39 @@ async function loadMissedCalls() {
 
 async function login(email, password) {
   try {
-    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+    const response = await fetch(`${BASE_URL}/auth/login`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email, password }),
       credentials: "include"
     });
-    const data = await response.json().catch(() => ({}));
+    const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Request failed");
     token = data.token || "";
     return data.user;
-  } catch (err) {
-    authMessage.textContent = err.message || "Request failed";
-    throw err;
+  } catch (error) {
+    console.error("Login request failed", error);
+    authMessage.textContent = error.message || "Request failed";
+    throw error;
   }
 }
 
 async function register(username, email, password) {
   try {
-    const response = await fetch(`${BASE_URL}/api/auth/signup`, {
+    const response = await fetch(`${BASE_URL}/auth/signup`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ username, email, password }),
       credentials: "include"
     });
-    const data = await response.json().catch(() => ({}));
+    const data = await response.json();
     if (!response.ok) throw new Error(data.message || "Request failed");
     token = data.token || "";
     return data.user;
-  } catch (err) {
-    authMessage.textContent = err.message || "Request failed";
-    throw err;
+  } catch (error) {
+    console.error("Signup request failed", error);
+    authMessage.textContent = error.message || "Request failed";
+    throw error;
   }
 }
 
@@ -1799,9 +1802,11 @@ function isSelectedPrivateMessage(message) {
 }
 
 function connectSocket() {
-  const options = { withCredentials: true };
-  if (token) options.auth = { token };
-  socket = io(SOCKET_URL, options);
+  socket = io(SOCKET_URL, {
+    transports: ["websocket"],
+    withCredentials: true,
+    auth: token ? { token } : undefined
+  });
 
   socket.on("userStatus", ({ userId, isOnline, lastSeen }) => {
     const target = users.find((u) => String(u.id) === String(userId));
