@@ -1,9 +1,5 @@
-const DEFAULT_BACKEND_PORT = "4000";
-const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
-const backendOrigin = isLocalhost && window.location.port !== DEFAULT_BACKEND_PORT
-  ? `${window.location.protocol}//${window.location.hostname}:${DEFAULT_BACKEND_PORT}`
-  : "https://realtimechataap-zpvo.onrender.com";
-const API_BASE = `${backendOrigin}/api`;
+// Update API base URL for production deployment
+const BASE_URL = window?.ENV?.API_BASE_URL || "https://realtimechataap-zpvo.onrender.com";
 const SOCKET_URL = backendOrigin;
 
 const authSection = document.getElementById("authSection");
@@ -1485,26 +1481,39 @@ async function loadMissedCalls() {
 }
 
 async function login(email, password) {
-  const data = await api("/auth/login", {
-    method: "POST",
-    body: JSON.stringify({ email, password })
-  });
-  token = data.token || "";
-  return data.user;
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email, password }),
+      credentials: "include"
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || "Request failed");
+    token = data.token || "";
+    return data.user;
+  } catch (err) {
+    authMessage.textContent = err.message || "Request failed";
+    throw err;
+  }
 }
 
 async function register(username, email, password) {
-  const response = await fetch("https://realtimechataap-zpvo.onrender.com/api/auth/signup", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ username, email, password }),
-    credentials: "include"
-  });
-
-  const data = await response.json().catch(() => ({}));
-  if (!response.ok) throw new Error(data.message || "Request failed");
-  token = data.token || "";
-  return data.user;
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/signup`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, email, password }),
+      credentials: "include"
+    });
+    const data = await response.json().catch(() => ({}));
+    if (!response.ok) throw new Error(data.message || "Request failed");
+    token = data.token || "";
+    return data.user;
+  } catch (err) {
+    authMessage.textContent = err.message || "Request failed";
+    throw err;
+  }
 }
 
 function renderAttachment(attachment) {
