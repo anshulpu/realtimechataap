@@ -1,6 +1,6 @@
 // Update API base URL for production deployment
 const BASE_URL = window?.ENV?.API_BASE_URL || "https://realtimechataap-zpvo.onrender.com";
-const SOCKET_URL = backendOrigin;
+const SOCKET_URL = "https://realtimechataap-zpvo.onrender.com";
 
 const authSection = document.getElementById("authSection");
 const chatSection = document.getElementById("chatSection");
