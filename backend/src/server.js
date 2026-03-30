@@ -26,6 +26,7 @@ const CORS_ORIGINS = CORS_ORIGIN_RAW.split(",")
   .filter(Boolean);
 const DEFAULT_CORS_ORIGINS = [`http://localhost:${PORT}`, "http://localhost:5173"];
 const CORS_ORIGIN = CORS_ORIGINS.length ? CORS_ORIGINS : DEFAULT_CORS_ORIGINS;
+const ALLOW_ALL_ORIGINS = CORS_ORIGIN.includes("*");
 const REDIS_URL = process.env.REDIS_URL || "";
 
 if (!JWT_SECRET || !MONGODB_URI) {
@@ -40,15 +41,25 @@ const uploadsPath = path.resolve(__dirname, "../uploads");
 const app = express();
 const server = http.createServer(app);
 
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (!origin) return callback(null, true);
+    if (ALLOW_ALL_ORIGINS) return callback(null, true);
+    if (CORS_ORIGIN.includes(origin)) return callback(null, true);
+    return callback(new Error("CORS origin not allowed"));
+  },
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+};
+
 const io = new Server(server, {
-  cors: {
-    origin: CORS_ORIGIN,
-    credentials: true
-  }
+  cors: corsOptions
 });
 
 app.use(helmet());
-app.use(cors({ origin: CORS_ORIGIN, credentials: true }));
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions));
 app.use(express.json({ limit: "1mb" }));
 app.use(cookieParser());
 

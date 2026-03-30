@@ -1,7 +1,8 @@
 const DEFAULT_BACKEND_PORT = "4000";
-const backendOrigin = window.location.port === DEFAULT_BACKEND_PORT
-  ? window.location.origin
-  : `${window.location.protocol}//${window.location.hostname}:${DEFAULT_BACKEND_PORT}`;
+const isLocalhost = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+const backendOrigin = isLocalhost && window.location.port !== DEFAULT_BACKEND_PORT
+  ? `${window.location.protocol}//${window.location.hostname}:${DEFAULT_BACKEND_PORT}`
+  : "https://realtimechataap-zpvo.onrender.com";
 const API_BASE = `${backendOrigin}/api`;
 const SOCKET_URL = backendOrigin;
 
@@ -1493,7 +1494,7 @@ async function login(email, password) {
 }
 
 async function register(username, email, password) {
-  const data = await api("/auth/register", {
+  const data = await api("/auth/signup", {
     method: "POST",
     body: JSON.stringify({ username, email, password })
   });
