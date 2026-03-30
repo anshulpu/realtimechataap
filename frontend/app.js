@@ -1,7 +1,52 @@
+// --- Auth API helpers ---
+const BASE_URL = "https://realtimechataap-zpvo.onrender.com";
+
+async function signupUser(username, email, password) {
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/signup`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ username, email, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Signup failed");
+    }
+    return data;
+  } catch (error) {
+    console.error("Signup error:", error);
+    throw error;
+  }
+}
+
+async function loginUser(email, password) {
+  try {
+    const response = await fetch(`${BASE_URL}/api/auth/login`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      credentials: "include",
+      body: JSON.stringify({ email, password })
+    });
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Login failed");
+    }
+    localStorage.setItem("token", data.token);
+    return data;
+  } catch (error) {
+    console.error("Login error:", error);
+    throw error;
+  }
+}
 // Production API base URL
 const BASE_URL = "https://realtimechataap-zpvo.onrender.com";
 import { io } from "socket.io-client";
-const SOCKET_URL = "https://realtimechataap-zpvo.onrender.com";
+const SOCKET_URL = BASE_URL;
 
 const authSection = document.getElementById("authSection");
 const chatSection = document.getElementById("chatSection");
