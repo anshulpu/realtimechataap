@@ -20,17 +20,12 @@ dotenv.config();
 const PORT = Number(process.env.PORT || 4000);
 const JWT_SECRET = process.env.JWT_SECRET;
 const MONGODB_URI = process.env.MONGODB_URI;
-const CORS_ORIGIN_RAW = process.env.CORS_ORIGIN || "";
-const CORS_ORIGINS = CORS_ORIGIN_RAW.split(",")
-  .map((origin) => origin.trim())
-  .filter(Boolean);
-const DEFAULT_CORS_ORIGINS = [
-  `http://localhost:${PORT}`,
+const allowedOrigins = [
   "http://localhost:5173",
+  "http://localhost:3000",
+  "https://realtimechataap-zpvo.onrender.com",
   "https://realtimechatapp.web.app"
 ];
-const CORS_ORIGIN = CORS_ORIGINS.length ? CORS_ORIGINS : DEFAULT_CORS_ORIGINS;
-const ALLOW_ALL_ORIGINS = CORS_ORIGIN.includes("*");
 const REDIS_URL = process.env.REDIS_URL || "";
 
 if (!JWT_SECRET || !MONGODB_URI) {
@@ -47,9 +42,9 @@ const server = http.createServer(app);
 
 const corsOptions = {
   origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (ALLOW_ALL_ORIGINS) return callback(null, true);
-    if (CORS_ORIGIN.includes(origin)) return callback(null, true);
+    if (!origin || allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
     return callback(new Error("CORS origin not allowed"));
   },
   credentials: true,

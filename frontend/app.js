@@ -1494,10 +1494,15 @@ async function login(email, password) {
 }
 
 async function register(username, email, password) {
-  const data = await api("/auth/signup", {
+  const response = await fetch("https://realtimechataap-zpvo.onrender.com/api/auth/signup", {
     method: "POST",
-    body: JSON.stringify({ username, email, password })
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ username, email, password }),
+    credentials: "include"
   });
+
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.message || "Request failed");
   token = data.token || "";
   return data.user;
 }
